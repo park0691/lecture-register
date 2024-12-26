@@ -2,6 +2,7 @@ package io.project.lectureregister.lecture.domain.entity;
 
 import io.project.lectureregister.user.domain.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,19 @@ public class LectureRegistration {
 
     @Column(name = "REG_DT")
     private LocalDateTime regDt;
+
+    @Builder
+    private LectureRegistration(Lecture lecture, User user, LocalDateTime regDt) {
+        this.lecture = lecture;
+        this.user = user;
+        this.regDt = regDt;
+    }
+
+    public static LectureRegistration create(Lecture lecture, User user) {
+        return LectureRegistration.builder()
+                .lecture(lecture)
+                .user(user)
+                .regDt(LocalDateTime.now())
+                .build();
+    }
 }

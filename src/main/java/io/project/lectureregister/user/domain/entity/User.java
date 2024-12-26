@@ -1,6 +1,7 @@
 package io.project.lectureregister.user.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,22 @@ public class User {
 
     @Column(name = "MOD_DT")
     private LocalDateTime modDt;
+
+    @Builder
+    private User(Long userId, String name, String email, String password, LocalDateTime regDt, LocalDateTime modDt) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.regDt = regDt;
+        this.modDt = modDt;
+    }
+
+    public static User createUser(String name, String email, LocalDateTime regDt) {
+        return User.builder()
+                .name(name)
+                .email(email)
+                .regDt(regDt)
+                .build();
+    }
 }
