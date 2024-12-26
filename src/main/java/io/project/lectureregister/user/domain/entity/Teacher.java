@@ -1,6 +1,7 @@
 package io.project.lectureregister.user.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,13 @@ public class Teacher {
 
     @Column(name = "MOD_DT")
     private LocalDateTime modDt;
+
+    @Builder
+    private Teacher(Long teacherId, String name, String email, LocalDateTime regDt, LocalDateTime modDt) {
+        this.teacherId = teacherId;
+        this.name = name;
+        this.email = email;
+        this.regDt = regDt;
+        this.modDt = modDt;
+    }
 }
