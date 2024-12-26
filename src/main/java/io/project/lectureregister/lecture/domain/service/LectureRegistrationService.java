@@ -25,4 +25,10 @@ public class LectureRegistrationService {
 
         return lectureRegistrationRepository.save(LectureRegistration.create(lecture, user));
     }
+
+    public List<Lecture> filterAcceptableLectures(List<Lecture> lectures) {
+        return lectures.stream()
+                .filter(lecture -> !lecture.isMaxCapacity(lectureRegistrationRepository.countByLecture(lecture)))
+                .toList();
+    }
 }

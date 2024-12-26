@@ -5,6 +5,8 @@ import io.project.lectureregister.lecture.domain.repository.ILectureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,5 +18,10 @@ public class LectureRepository implements ILectureRepository {
     @Override
     public Optional<Lecture> findBy(Long lectureId) {
         return lectureJpaRepository.findById(lectureId);
+    }
+
+    @Override
+    public List<Lecture> findByStartDtAfter(LocalDateTime date) {
+        return lectureJpaRepository.findByStartDtAfter(date);
     }
 }

@@ -18,9 +18,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -82,5 +80,58 @@ class LectureRegistrationServiceTest {
         ))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXCEED_MAX_LECTURE_CAPACITY);
+    }
+
+    @DisplayName("특강 리스트에서 신청 최대 정원 수를 초과하지 않은 특강들을 반환한다.")
+    @Test
+    void filterAcceptableLectures() {
+        // given
+        int maxApplyCapacity = 30;
+        List<Lecture> lectures = List.of(
+                Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+                        LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
+                        LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)
+                ),
+                Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+                        LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
+                        LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0)
+                ),
+                Lecture.createLecture("플러스 토요 특강 3주차", maxApplyCapacity,
+                        LocalDateTime.of(2025, Month.JANUARY, 18, 13, 0),
+                        LocalDateTime.of(2025, Month.JANUARY, 18, 18, 0)
+                ),
+                Lecture.createLecture("플러스 토요 특강 4주차", maxApplyCapacity,
+                        LocalDateTime.of(2025, Month.JANUARY, 25, 13, 0),
+                        LocalDateTime.of(2025, Month.JANUARY, 25, 18, 0)
+                )
+        );
+
+        given(lectureRegistrationRepository.countByLecture(lectures.get(0)))
+                .willReturn(0);
+        given(lectureRegistrationRepository.countByLecture(lectures.get(1)))
+                .willReturn(10);
+        given(lectureRegistrationRepository.countByLecture(lectures.get(2)))
+                .willReturn(29);
+        given(lectureRegistrationRepository.countByLecture(lectures.get(3)))
+                .willReturn(30);
+
+        // when
+        List<Lecture> acceptableLectures = lectureRegistrationService.filterAcceptableLectures(lectures);
+
+        // then
+        assertThat(acceptableLectures).isNotNull();
+        assertThat(acceptableLectures).hasSize(3)
+                .extracting("name", "maxApplyCapacity", "startDt", "endDt")
+                .containsExactlyInAnyOrder(
+                        tuple("플러스 토요 특강 1주차", maxApplyCapacity,
+                                LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
+                                LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)),
+                        tuple("플러스 토요 특강 2주차", maxApplyCapacity,
+                                LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
+                                LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0)),
+                        tuple("플러스 토요 특강 3주차", maxApplyCapacity,
+                                LocalDateTime.of(2025, Month.JANUARY, 18, 13, 0),
+                                LocalDateTime.of(2025, Month.JANUARY, 18, 18, 0))
+                );
     }
 }

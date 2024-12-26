@@ -14,6 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,5 +55,23 @@ class LectureControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("Success"));
+    }
+
+    @DisplayName("신청 가능한 특강을 조회한다.")
+    @Test
+    void getAvailableLectures() throws Exception {
+        // given
+        given(lectureFacade.getAvailableLectures(any(LocalDate.class)))
+                .willReturn(List.of());
+
+        // when, then
+        mockMvc.perform(
+                        get("/api/v1/lectures/available")
+                                .queryParam("date", "2024-12-25")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Success"))
+                .andExpect(jsonPath("$.data").isArray());
     }
 }

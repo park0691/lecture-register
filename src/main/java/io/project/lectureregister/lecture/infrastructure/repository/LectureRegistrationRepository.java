@@ -23,4 +23,9 @@ public class LectureRegistrationRepository implements ILectureRegistrationReposi
     public List<LectureRegistration> findByLecture(Lecture lecture) {
         return lectureRegistrationJpaRepository.findByLecture(lecture);
     }
+
+    @Override
+    public int countByLecture(Lecture lecture) {
+        return lectureRegistrationJpaRepository.countByLecture(lecture);
+    }
 }
