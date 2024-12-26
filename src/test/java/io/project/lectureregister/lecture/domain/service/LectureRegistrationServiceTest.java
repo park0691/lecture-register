@@ -36,12 +36,10 @@ class LectureRegistrationServiceTest {
     void register() {
         // given
         User user = User.createUser("PARK", "test@gmail.com", LocalDateTime.now());
-        Lecture lecture = Lecture.createLecture("플러스 특강", 30,
+        Lecture lecture = Lecture.createLecture("플러스 특강", 0, 30,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
         LectureRegistration lectureRegistration = LectureRegistration.create(lecture, user);
-        given(lectureRegistrationRepository.findByLecture(any(Lecture.class)))
-                .willReturn(List.of());
         given(lectureRegistrationRepository.save(any(LectureRegistration.class)))
                 .willReturn(lectureRegistration);
 
@@ -58,20 +56,10 @@ class LectureRegistrationServiceTest {
     @Test
     void registerWithExceedMaxCapacity() {
         // given
-        int maxApplyCapacity = 30;
-        Lecture lecture = Lecture.createLecture("플러스 특강", maxApplyCapacity,
+        int maxCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 특강", 30, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
-
-        List<LectureRegistration> lectureRegistrations = new ArrayList<>();
-        for (int i = 0; i < maxApplyCapacity; i++) {
-            lectureRegistrations.add(LectureRegistration.create(
-                    lecture, User.createUser("PARK" + i, "test" + i + "@gmail.com", LocalDateTime.now()))
-            );
-        }
-
-        given(lectureRegistrationRepository.findByLecture(any(Lecture.class)))
-                .willReturn(lectureRegistrations);
 
         // when, then
         assertThatThrownBy(() -> lectureRegistrationService.register(
@@ -86,34 +74,25 @@ class LectureRegistrationServiceTest {
     @Test
     void filterAcceptableLectures() {
         // given
-        int maxApplyCapacity = 30;
+        int maxCapacity = 30;
         List<Lecture> lectures = List.of(
-                Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+                Lecture.createLecture("플러스 토요 특강 1주차", 0, maxCapacity,
                         LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
                         LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)
                 ),
-                Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+                Lecture.createLecture("플러스 토요 특강 2주차", 10, maxCapacity,
                         LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
                         LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0)
                 ),
-                Lecture.createLecture("플러스 토요 특강 3주차", maxApplyCapacity,
+                Lecture.createLecture("플러스 토요 특강 3주차", 29, maxCapacity,
                         LocalDateTime.of(2025, Month.JANUARY, 18, 13, 0),
                         LocalDateTime.of(2025, Month.JANUARY, 18, 18, 0)
                 ),
-                Lecture.createLecture("플러스 토요 특강 4주차", maxApplyCapacity,
+                Lecture.createLecture("플러스 토요 특강 4주차", 30, maxCapacity,
                         LocalDateTime.of(2025, Month.JANUARY, 25, 13, 0),
                         LocalDateTime.of(2025, Month.JANUARY, 25, 18, 0)
                 )
         );
-
-        given(lectureRegistrationRepository.countByLecture(lectures.get(0)))
-                .willReturn(0);
-        given(lectureRegistrationRepository.countByLecture(lectures.get(1)))
-                .willReturn(10);
-        given(lectureRegistrationRepository.countByLecture(lectures.get(2)))
-                .willReturn(29);
-        given(lectureRegistrationRepository.countByLecture(lectures.get(3)))
-                .willReturn(30);
 
         // when
         List<Lecture> acceptableLectures = lectureRegistrationService.filterAcceptableLectures(lectures);
@@ -121,15 +100,15 @@ class LectureRegistrationServiceTest {
         // then
         assertThat(acceptableLectures).isNotNull();
         assertThat(acceptableLectures).hasSize(3)
-                .extracting("name", "maxApplyCapacity", "startDt", "endDt")
+                .extracting("name", "capacity", "maxCapacity", "startDt", "endDt")
                 .containsExactlyInAnyOrder(
-                        tuple("플러스 토요 특강 1주차", maxApplyCapacity,
+                        tuple("플러스 토요 특강 1주차", 0, maxCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)),
-                        tuple("플러스 토요 특강 2주차", maxApplyCapacity,
+                        tuple("플러스 토요 특강 2주차", 10, maxCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0)),
-                        tuple("플러스 토요 특강 3주차", maxApplyCapacity,
+                        tuple("플러스 토요 특강 3주차", 29, maxCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 18, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 18, 18, 0))
                 );
@@ -141,11 +120,11 @@ class LectureRegistrationServiceTest {
         // given
         User user = User.createUser("PARK1", "test1@gmail.com", LocalDateTime.now());
 
-        int maxApplyCapacity = 30;
-        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+        int maxCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차",1, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0));
-        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", 1, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0));
 
@@ -162,12 +141,12 @@ class LectureRegistrationServiceTest {
         // then
         assertThat(registeredLectures).isNotNull();
         assertThat(registeredLectures).hasSize(2)
-                .extracting("name", "maxApplyCapacity", "startDt", "endDt")
+                .extracting("name", "capacity", "maxCapacity", "startDt", "endDt")
                 .containsExactlyInAnyOrder(
-                        tuple("플러스 토요 특강 1주차", maxApplyCapacity,
+                        tuple("플러스 토요 특강 1주차", 1, maxCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)),
-                        tuple("플러스 토요 특강 2주차", maxApplyCapacity,
+                        tuple("플러스 토요 특강 2주차", 1, maxCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0))
                 );

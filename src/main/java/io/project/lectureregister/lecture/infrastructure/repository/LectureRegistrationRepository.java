@@ -27,11 +27,6 @@ public class LectureRegistrationRepository implements ILectureRegistrationReposi
     }
 
     @Override
-    public int countByLecture(Lecture lecture) {
-        return lectureRegistrationJpaRepository.countByLecture(lecture);
-    }
-
-    @Override
     public List<LectureRegistration> findByUser(User user) {
         return lectureRegistrationQueryRepository.findByUser(user);
     }

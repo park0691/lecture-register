@@ -11,7 +11,5 @@ public interface ILectureRegistrationRepository {
 
     List<LectureRegistration> findByLecture(Lecture lecture);
 
-    int countByLecture(Lecture lecture);
-
     List<LectureRegistration> findByUser(User user);
 }

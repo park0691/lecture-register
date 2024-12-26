@@ -18,17 +18,18 @@ public class LectureRegistrationService {
     private final ILectureRegistrationRepository lectureRegistrationRepository;
 
     public LectureRegistration register(User user, Lecture lecture) {
-        List<LectureRegistration> lectureRegistrations = lectureRegistrationRepository.findByLecture(lecture);
-        if (lecture.isMaxCapacity(lectureRegistrations.size())) {
+        if (lecture.isMaxCapacity()) {
             throw new CustomException(ErrorCode.EXCEED_MAX_LECTURE_CAPACITY);
         }
+        
+        lecture.increaseCapacity();
 
         return lectureRegistrationRepository.save(LectureRegistration.create(lecture, user));
     }
 
     public List<Lecture> filterAcceptableLectures(List<Lecture> lectures) {
         return lectures.stream()
-                .filter(lecture -> !lecture.isMaxCapacity(lectureRegistrationRepository.countByLecture(lecture)))
+                .filter(lecture -> !lecture.isMaxCapacity())
                 .toList();
     }
 

@@ -29,7 +29,7 @@ public class LectureFacade {
 
     public void register(LectureRegisterCommand command) {
         User user = userService.getUser(command.getUserId());
-        Lecture lecture = lectureService.getLecture(command.getLectureId());
+        Lecture lecture = lectureService.getLectureForUpdate(command.getLectureId());
         lectureRegistrationService.register(user, lecture);
     }
 

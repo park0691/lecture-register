@@ -16,8 +16,8 @@ public class LectureService {
 
     private final ILectureRepository lectureRepository;
 
-    public Lecture getLecture(Long id) {
-        return lectureRepository.findBy(id)
+    public Lecture getLectureForUpdate(Long id) {
+        return lectureRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.LECTURE_NOT_FOUND));
     }
 

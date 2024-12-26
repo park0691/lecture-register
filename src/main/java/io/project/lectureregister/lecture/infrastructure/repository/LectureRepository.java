@@ -16,8 +16,8 @@ public class LectureRepository implements ILectureRepository {
     private final LectureJpaRepository lectureJpaRepository;
 
     @Override
-    public Optional<Lecture> findBy(Long lectureId) {
-        return lectureJpaRepository.findById(lectureId);
+    public Optional<Lecture> findByIdForUpdate(Long lectureId) {
+        return lectureJpaRepository.findByIdForUpdate(lectureId);
     }
 
     @Override

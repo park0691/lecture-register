@@ -1,10 +1,13 @@
-package io.project.lectureregister.lecture.domain.service;
+package io.project.lectureregister.lecture.application;
 
 import io.project.lectureregister.global.common.exception.CustomException;
+import io.project.lectureregister.lecture.domain.command.LectureRegisterCommand;
 import io.project.lectureregister.lecture.domain.entity.Lecture;
 import io.project.lectureregister.lecture.infrastructure.repository.LectureJpaRepository;
+import io.project.lectureregister.lecture.infrastructure.repository.LectureRegistrationJpaRepository;
 import io.project.lectureregister.user.domain.entity.User;
 import io.project.lectureregister.user.repository.UserJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class LectureRegistrationServiceConcurrencyTest {
+public class LectureFacadeConcurrencyTest {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
@@ -31,7 +34,17 @@ public class LectureRegistrationServiceConcurrencyTest {
     private LectureJpaRepository lectureJpaRepository;
 
     @Autowired
-    private LectureRegistrationService lectureRegistrationService;
+    private LectureRegistrationJpaRepository lectureRegistrationJpaRepository;
+
+    @Autowired
+    private LectureFacade lectureFacade;
+
+    @BeforeEach
+    void beforeEach() {
+        lectureRegistrationJpaRepository.deleteAllInBatch();
+        lectureJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+    }
 
     @DisplayName("최대 정원이 30명인 특강에 동시에 40명이 신청했을 때, 30명만 성공하고 나머지는 실패해야 한다.")
     @Test
@@ -42,8 +55,8 @@ public class LectureRegistrationServiceConcurrencyTest {
             users.add(User.createUser("PARK" + i, "test" + i + "@gmail.com", LocalDateTime.now()));
         userJpaRepository.saveAll(users);
 
-        int maxApplyCapacity = 30;
-        Lecture lecture = Lecture.createLecture("", maxApplyCapacity,
+        int maxCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 특강", 0, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
         lectureJpaRepository.save(lecture);
@@ -60,7 +73,12 @@ public class LectureRegistrationServiceConcurrencyTest {
             User user = users.get(i);
             executorService.submit(() -> {
                 try {
-                    lectureRegistrationService.register(user, lecture);
+                    lectureFacade.register(
+                            LectureRegisterCommand.builder()
+                                    .userId(user.getUserId())
+                                    .lectureId(lecture.getLectureId())
+                                    .build()
+                    );
                     successCount.incrementAndGet();
                 } catch (CustomException e) {
                     failCount.incrementAndGet();
@@ -73,7 +91,7 @@ public class LectureRegistrationServiceConcurrencyTest {
         executorService.shutdown();
 
         // then
-        assertThat(successCount.get()).isEqualTo(maxApplyCapacity);
+        assertThat(successCount.get()).isEqualTo(maxCapacity);
         assertThat(failCount.get()).isEqualTo(10);
     }
 }

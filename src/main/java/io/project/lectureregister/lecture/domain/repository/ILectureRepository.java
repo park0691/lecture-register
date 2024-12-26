@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ILectureRepository {
-    Optional<Lecture> findBy(Long lectureId);
+    Optional<Lecture> findByIdForUpdate(Long lectureId);
 
     List<Lecture> findByStartDtAfter(LocalDateTime date);
 }

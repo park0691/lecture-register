@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface LectureRegistrationJpaRepository extends JpaRepository<LectureRegistration, Long> {
     List<LectureRegistration> findByLecture(Lecture lecture);
-
-    int countByLecture(Lecture lecture);
 }

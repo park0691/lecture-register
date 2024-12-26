@@ -37,24 +37,24 @@ class LectureServiceTest {
         long lectureId = 1L;
 
         // when, then
-        assertThatThrownBy(() -> lectureService.getLecture(lectureId))
+        assertThatThrownBy(() -> lectureService.getLectureForUpdate(lectureId))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.LECTURE_NOT_FOUND);
     }
 
     @DisplayName("특강 아이디로 특강 정보를 조회한다.")
     @Test
-    void getLecture() {
+    void getLectureForUpdate() {
         // given
         long lectureId = 1L;
-        Lecture lecture = Lecture.createLecture("플러스 특강", 30,
+        Lecture lecture = Lecture.createLecture("플러스 특강", 0, 30,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
-        given(lectureRepository.findBy(any(Long.class)))
+        given(lectureRepository.findByIdForUpdate(any(Long.class)))
                 .willReturn(Optional.of(lecture));
 
         // when
-        Lecture foundLecture = lectureService.getLecture(lectureId);
+        Lecture foundLecture = lectureService.getLectureForUpdate(lectureId);
 
         // then
         assertThat(foundLecture).usingRecursiveComparison()
@@ -65,11 +65,11 @@ class LectureServiceTest {
     @Test
     void getOpenLectures() {
         // given
-        int maxApplyCapacity = 30;
-        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+        int maxCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차", 0, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0));
-        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", 0, maxCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0));
 
