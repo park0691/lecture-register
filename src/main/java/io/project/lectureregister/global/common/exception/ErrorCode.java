@@ -19,7 +19,7 @@ public enum ErrorCode {
     EXCEED_MAX_LECTURE_CAPACITY(NOT_FOUND, "특강 신청 수용 최대 인원을 초과하였습니다."),
 
     /* 409 CONFLICT : Resource의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
-    APPLY_LECTURE_DUPLICATE(CONFLICT, "이미 특강을 신청한 유저입니다.");
+    LECTURE_REGISTER_DUPLICATE(CONFLICT, "이미 특강을 신청한 유저입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

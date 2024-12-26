@@ -5,9 +5,11 @@ import io.project.lectureregister.lecture.domain.entity.LectureRegistration;
 import io.project.lectureregister.lecture.domain.repository.ILectureRegistrationRepository;
 import io.project.lectureregister.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class LectureRegistrationRepository implements ILectureRegistrationReposi
     }
 
     @Override
-    public List<LectureRegistration> findByLecture(Lecture lecture) {
-        return lectureRegistrationJpaRepository.findByLecture(lecture);
+    public Optional<LectureRegistration> findByLectureAndUser(Lecture lecture, User user) {
+        return lectureRegistrationJpaRepository.findByLectureAndUser(lecture, user);
     }
 
     @Override

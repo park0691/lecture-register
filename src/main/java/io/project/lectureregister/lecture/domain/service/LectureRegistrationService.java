@@ -21,7 +21,11 @@ public class LectureRegistrationService {
         if (lecture.isMaxCapacity()) {
             throw new CustomException(ErrorCode.EXCEED_MAX_LECTURE_CAPACITY);
         }
-        
+//        lectureRegistrationRepository.findByLectureAndUser(lecture, user)
+//                .ifPresent(r -> {
+//                    throw new CustomException(ErrorCode.LECTURE_REGISTER_DUPLICATE);
+//                });
+
         lecture.increaseCapacity();
 
         return lectureRegistrationRepository.save(LectureRegistration.create(lecture, user));
