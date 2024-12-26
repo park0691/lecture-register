@@ -31,4 +31,10 @@ public class LectureRegistrationService {
                 .filter(lecture -> !lecture.isMaxCapacity(lectureRegistrationRepository.countByLecture(lecture)))
                 .toList();
     }
+
+    public List<Lecture> getRegisteredLectures(User user) {
+        return lectureRegistrationRepository.findByUser(user).stream()
+                .map(LectureRegistration::getLecture)
+                .toList();
+    }
 }

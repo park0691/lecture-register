@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +47,7 @@ class LectureServiceTest {
     void getLecture() {
         // given
         long lectureId = 1L;
-        Lecture lecture = Lecture.createLecture("", 30,
+        Lecture lecture = Lecture.createLecture("플러스 특강", 30,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
         given(lectureRepository.findBy(any(Long.class)))
@@ -58,5 +59,29 @@ class LectureServiceTest {
         // then
         assertThat(foundLecture).usingRecursiveComparison()
                 .isEqualTo(lecture);
+    }
+
+    @DisplayName("특강 시작 일자가 입력받은 일자 이후에 해당하는 특강을 조회한다.")
+    @Test
+    void getOpenLectures() {
+        // given
+        int maxApplyCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+                LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
+                LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0));
+        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+                LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
+                LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0));
+
+        given(lectureRepository.findByStartDtAfter(any(LocalDateTime.class)))
+                .willReturn(List.of(lecture, lecture2));
+
+        // when
+        List<Lecture> lectures = lectureService.getOpenLectures(LocalDateTime.now());
+
+        // then
+        assertThat(lectures).isNotNull();
+        assertThat(lectures).usingRecursiveComparison()
+                .isEqualTo(List.of(lecture, lecture2));
     }
 }

@@ -8,9 +8,9 @@ import io.project.lectureregister.lecture.interfaces.api.dto.LectureResponse;
 import io.project.lectureregister.lecture.interfaces.api.mapper.LectureMapper;
 import io.project.lectureregister.user.domain.entity.User;
 import io.project.lectureregister.user.domain.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,10 +33,20 @@ public class LectureFacade {
         lectureRegistrationService.register(user, lecture);
     }
 
+    @Transactional(readOnly = true)
     public List<LectureResponse> getAvailableLectures(LocalDate date) {
         List<Lecture> openLectures = lectureService.getOpenLectures(LocalDateTime.of(date, LocalTime.of(23, 59, 59)));
 
         return lectureRegistrationService.filterAcceptableLectures(openLectures).stream()
+                .map(lectureMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LectureResponse> getRegisteredLectures(Long userId) {
+        User user = userService.getUser(userId);
+
+        return lectureRegistrationService.getRegisteredLectures(user).stream()
                 .map(lectureMapper::toResponse)
                 .toList();
     }

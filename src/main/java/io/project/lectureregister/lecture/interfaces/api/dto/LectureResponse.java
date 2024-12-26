@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class LectureResponse {
     private Long lectureId;
     private String lectureName;
+    private Long teacherId;
     private String teacherName;
     private String teacherEmail;
     private Integer maxApplyCapacity;

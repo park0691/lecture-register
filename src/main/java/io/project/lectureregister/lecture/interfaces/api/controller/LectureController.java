@@ -33,4 +33,9 @@ public class LectureController {
     ) {
         return ApiResponse.ok(lectureFacade.getAvailableLectures(date));
     }
+
+    @GetMapping("/registrations")
+    public ApiResponse<List<LectureResponse>> getRegistrations(@RequestParam("userId") Long userId) {
+        return ApiResponse.ok(lectureFacade.getRegisteredLectures(userId));
+    }
 }

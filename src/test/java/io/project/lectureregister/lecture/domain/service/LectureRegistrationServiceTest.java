@@ -36,7 +36,7 @@ class LectureRegistrationServiceTest {
     void register() {
         // given
         User user = User.createUser("PARK", "test@gmail.com", LocalDateTime.now());
-        Lecture lecture = Lecture.createLecture("", 30,
+        Lecture lecture = Lecture.createLecture("플러스 특강", 30,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
         LectureRegistration lectureRegistration = LectureRegistration.create(lecture, user);
@@ -59,7 +59,7 @@ class LectureRegistrationServiceTest {
     void registerWithExceedMaxCapacity() {
         // given
         int maxApplyCapacity = 30;
-        Lecture lecture = Lecture.createLecture("", maxApplyCapacity,
+        Lecture lecture = Lecture.createLecture("플러스 특강", maxApplyCapacity,
                 LocalDateTime.of(2025, Month.JANUARY, 7, 15, 0),
                 LocalDateTime.of(2025, Month.JANUARY, 7, 18, 0));
 
@@ -132,6 +132,44 @@ class LectureRegistrationServiceTest {
                         tuple("플러스 토요 특강 3주차", maxApplyCapacity,
                                 LocalDateTime.of(2025, Month.JANUARY, 18, 13, 0),
                                 LocalDateTime.of(2025, Month.JANUARY, 18, 18, 0))
+                );
+    }
+
+    @DisplayName("사용자가 신청한 특강을 조회한다.")
+    @Test
+    void getRegisteredLectures() {
+        // given
+        User user = User.createUser("PARK1", "test1@gmail.com", LocalDateTime.now());
+
+        int maxApplyCapacity = 30;
+        Lecture lecture = Lecture.createLecture("플러스 토요 특강 1주차", maxApplyCapacity,
+                LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
+                LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0));
+        Lecture lecture2 = Lecture.createLecture("플러스 토요 특강 2주차", maxApplyCapacity,
+                LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
+                LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0));
+
+        List<LectureRegistration> lectureRegistrations = new ArrayList<>();
+        lectureRegistrations.add(LectureRegistration.create(lecture, user));
+        lectureRegistrations.add(LectureRegistration.create(lecture2, user));
+
+        given(lectureRegistrationRepository.findByUser(any(User.class)))
+                .willReturn(lectureRegistrations);
+
+        // when
+        List<Lecture> registeredLectures = lectureRegistrationService.getRegisteredLectures(user);
+
+        // then
+        assertThat(registeredLectures).isNotNull();
+        assertThat(registeredLectures).hasSize(2)
+                .extracting("name", "maxApplyCapacity", "startDt", "endDt")
+                .containsExactlyInAnyOrder(
+                        tuple("플러스 토요 특강 1주차", maxApplyCapacity,
+                                LocalDateTime.of(2025, Month.JANUARY, 4, 13, 0),
+                                LocalDateTime.of(2025, Month.JANUARY, 4, 18, 0)),
+                        tuple("플러스 토요 특강 2주차", maxApplyCapacity,
+                                LocalDateTime.of(2025, Month.JANUARY, 11, 13, 0),
+                                LocalDateTime.of(2025, Month.JANUARY, 11, 18, 0))
                 );
     }
 }

@@ -13,6 +13,7 @@ public interface LectureMapper {
     LectureRegisterCommand toCommand(LectureRegisterRequest request);
 
     @Mapping(source = "name", target = "lectureName")
+    @Mapping(source = "teacher.teacherId", target = "teacherId")
     @Mapping(source = "teacher.name", target = "teacherName")
     @Mapping(source = "teacher.email", target = "teacherEmail")
     LectureResponse toResponse(Lecture lecture);
