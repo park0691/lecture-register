@@ -9,7 +9,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "LECTURE_REGISTRATION")
+@Table(
+    name = "LECTURE_REGISTRATION",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "UQ_USER_LEC",
+            columnNames = {"LECTURE_ID", "USER_ID"}
+        )
+    }
+)
 @NoArgsConstructor
 @Getter
 public class LectureRegistration {
